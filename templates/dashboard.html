@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Gemini File Search{% endblock %}
+
+{% block content %}
+<div class="card mb-20">
+    <div class="flex gap-10">
+        <h2>File Search Stores</h2>
+        <button class="btn btn-primary" onclick="showCreateForm()">Create Store</button>
+    </div>
+
+    <div id="create-form" style="display: none; margin-top: 20px;">
+        <input type="text" id="store-name" placeholder="Store name (optional)">
+        <div class="flex gap-10">
+            <button class="btn btn-primary" onclick="createStore()">Create</button>
+            <button class="btn btn-secondary" onclick="hideCreateForm()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div id="stores-list" hx-get="/stores" hx-trigger="load, storeCreated from:body" hx-swap="innerHTML">
+    <div class="loading">Loading stores...</div>
+</div>
+
+<script>
+function showCreateForm() {
+    document.getElementById('create-form').style.display = 'block';
+}
+
+function hideCreateForm() {
+    document.getElementById('create-form').style.display = 'none';
+    document.getElementById('store-name').value = '';
+}
+
+async function createStore() {
+    const displayName = document.getElementById('store-name').value;
+
+    try {
+        const response = await fetch('/stores', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ display_name: displayName || null })
+        });
+
+        if (response.ok) {
+            hideCreateForm();
+            document.body.dispatchEvent(new Event('storeCreated'));
+        } else {
+            const error = await response.json();
+            alert('Error: ' + error.detail);
+        }
+    } catch (error) {
+        alert('Error creating store: ' + error.message);
+    }
+}
+
+async function deleteStore(storeName, force = false) {
+    if (!confirm('Delete this store? This action cannot be undone.')) {
+        return;
+    }
+
+    const storeId = storeName.split('/')[1];
+
+    try {
+        const response = await fetch(`/stores/${storeId}?force=${force}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            document.body.dispatchEvent(new Event('storeCreated'));
+        } else {
+            const error = await response.json();
+            alert('Error: ' + error.detail);
+        }
+    } catch (error) {
+        alert('Error deleting store: ' + error.message);
+    }
+}
+
+// HTMX after-swap event to render stores
+document.addEventListener('htmx:afterSwap', function(event) {
+    if (event.detail.target.id === 'stores-list') {
+        renderStores(event.detail.xhr.response);
+    }
+});
+
+function renderStores(responseText) {
+    const data = JSON.parse(responseText);
+    const container = document.getElementById('stores-list');
+
+    if (!data.stores || data.stores.length === 0) {
+        container.innerHTML = '<div class="card"><p style="color: #5f6368;">No stores yet. Create one to get started.</p></div>';
+        return;
+    }
+
+    container.innerHTML = data.stores.map(store => {
+        const storeId = store.name.split('/')[1];
+        return `
+            <div class="card">
+                <div class="flex">
+                    <div>
+                        <h2>${store.display_name || storeId}</h2>
+                        <div style="margin: 10px 0;">
+                            <span class="metric"><strong>${store.active_documents_count}</strong> active</span>
+                            <span class="metric"><strong>${store.pending_documents_count}</strong> pending</span>
+                            <span class="metric"><strong>${store.failed_documents_count}</strong> failed</span>
+                            <span class="metric"><strong>${formatBytes(store.size_bytes)}</strong></span>
+                        </div>
+                        <p style="color: #5f6368; font-size: 13px; margin-top: 5px;">${store.name}</p>
+                    </div>
+                    <div class="flex gap-10">
+                        <button class="btn btn-primary" onclick="window.location.href='/stores/${storeId}'">
+                            Open
+                        </button>
+                        <button class="btn btn-danger" onclick="deleteStore('${store.name}', true)">
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function formatBytes(bytes) {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+}
+</script>
+{% endblock %}
