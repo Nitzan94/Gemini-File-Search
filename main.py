@@ -25,8 +25,9 @@ if not os.getenv('GEMINI_API_KEY'):
 app = FastAPI(title='Gemini File Search', version='1.0.0')
 
 # Setup templates and static files
-templates = Jinja2Templates(directory='templates')
-app.mount('/static', StaticFiles(directory='static'), name='static')
+BASE_DIR = Path(__file__).parent
+templates = Jinja2Templates(directory=str(BASE_DIR / 'templates'))
+app.mount('/static', StaticFiles(directory=str(BASE_DIR / 'static')), name='static')
 
 # Include routers
 app.include_router(stores_router)
