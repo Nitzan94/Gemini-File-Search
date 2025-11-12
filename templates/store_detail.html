@@ -21,10 +21,23 @@
 </div>
 
 <div class="card mb-20">
-    <h2>Search Documents</h2>
-    <textarea id="query-input" placeholder="Ask a question about your documents..."></textarea>
-    <button class="btn btn-primary" onclick="performSearch()">Search</button>
-    <div id="search-results" style="margin-top: 20px;"></div>
+    <h2>Chat with Your Documents</h2>
+    <div class="chat-container">
+        <div class="chat-messages" id="chat-messages">
+            <div class="welcome-message">
+                <p>Ask me anything about your documents...</p>
+            </div>
+        </div>
+        <div class="chat-input-container">
+            <textarea id="chat-input" placeholder="Type your question..." rows="1"></textarea>
+            <button class="btn btn-primary" id="send-btn" onclick="sendMessage()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
+    </div>
 </div>
 
 <div class="card">
@@ -146,15 +159,32 @@ async function pollOperation(operationName, progressItem, fileName) {
     }, 2000);
 }
 
-async function performSearch() {
-    const query = document.getElementById('query-input').value.trim();
-    if (!query) {
-        alert('Please enter a search query');
-        return;
+// Chat functionality
+async function sendMessage() {
+    const input = document.getElementById('chat-input');
+    const query = input.value.trim();
+
+    if (!query) return;
+
+    const messagesContainer = document.getElementById('chat-messages');
+    const sendBtn = document.getElementById('send-btn');
+
+    // Remove welcome message if exists
+    const welcomeMsg = messagesContainer.querySelector('.welcome-message');
+    if (welcomeMsg) {
+        welcomeMsg.remove();
     }
 
-    const resultsDiv = document.getElementById('search-results');
-    resultsDiv.innerHTML = '<div class="loading">Searching...</div>';
+    // Add user message
+    addMessage('user', query);
+
+    // Clear input and disable button
+    input.value = '';
+    input.style.height = 'auto';
+    sendBtn.disabled = true;
+
+    // Show typing indicator
+    const typingId = addTypingIndicator();
 
     try {
         const response = await fetch('/api/query', {
@@ -166,32 +196,106 @@ async function performSearch() {
             })
         });
 
+        // Remove typing indicator
+        removeTypingIndicator(typingId);
+
         if (response.ok) {
             const result = await response.json();
-
-            let html = `<div style="padding: 15px; background: #f8f9fa; border-radius: 4px; margin-bottom: 15px;">
-                <strong>Answer:</strong><br>${result.text || 'No answer found'}
-            </div>`;
-
-            if (result.citations && result.citations.length > 0) {
-                html += '<h3 style="font-size: 14px; margin-bottom: 10px;">Sources:</h3>';
-                result.citations.forEach((citation, index) => {
-                    html += `<div class="citation">
-                        <strong>[${index + 1}]</strong> ${citation.title || 'Untitled'}
-                        ${citation.uri ? `<br><a href="${citation.uri}" target="_blank">${citation.uri}</a>` : ''}
-                    </div>`;
-                });
-            }
-
-            resultsDiv.innerHTML = html;
+            addMessage('ai', result.text || 'No answer found', result.citations);
         } else {
             const error = await response.json();
-            resultsDiv.innerHTML = `<p style="color: #ea4335;">Error: ${error.detail}</p>`;
+            addMessage('ai', `Error: ${error.detail}`, null, true);
         }
     } catch (error) {
-        resultsDiv.innerHTML = `<p style="color: #ea4335;">Error: ${error.message}</p>`;
+        removeTypingIndicator(typingId);
+        addMessage('ai', `Error: ${error.message}`, null, true);
+    } finally {
+        sendBtn.disabled = false;
+        input.focus();
     }
 }
+
+function addMessage(type, text, citations = null, isError = false) {
+    const messagesContainer = document.getElementById('chat-messages');
+
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${type}`;
+
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content';
+
+    // Format text with line breaks
+    const paragraphs = text.split('\n').filter(p => p.trim());
+    paragraphs.forEach(para => {
+        const p = document.createElement('p');
+        p.textContent = para;
+        contentDiv.appendChild(p);
+    });
+
+    // Add citations if present
+    if (citations && citations.length > 0) {
+        const citationsDiv = document.createElement('div');
+        citationsDiv.className = 'message-citations';
+        citationsDiv.innerHTML = '<strong>Sources:</strong>';
+
+        citations.forEach((citation, index) => {
+            const citItem = document.createElement('div');
+            citItem.className = 'citation-item';
+            citItem.innerHTML = `[${index + 1}] ${citation.title || 'Source'}${
+                citation.uri ? ` - <a href="${citation.uri}" target="_blank">View</a>` : ''
+            }`;
+            citationsDiv.appendChild(citItem);
+        });
+
+        contentDiv.appendChild(citationsDiv);
+    }
+
+    messageDiv.appendChild(contentDiv);
+    messagesContainer.appendChild(messageDiv);
+
+    // Scroll to bottom
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function addTypingIndicator() {
+    const messagesContainer = document.getElementById('chat-messages');
+
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'message ai';
+    messageDiv.id = 'typing-indicator';
+
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'typing-indicator';
+    typingDiv.innerHTML = '<span></span><span></span><span></span>';
+
+    messageDiv.appendChild(typingDiv);
+    messagesContainer.appendChild(messageDiv);
+
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+    return 'typing-indicator';
+}
+
+function removeTypingIndicator(id) {
+    const indicator = document.getElementById(id);
+    if (indicator) {
+        indicator.remove();
+    }
+}
+
+// Auto-resize textarea
+document.getElementById('chat-input').addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+});
+
+// Send on Enter (Shift+Enter for new line)
+document.getElementById('chat-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+    }
+});
 
 async function deleteDocument(docName) {
     if (!confirm('Delete this document?')) {
