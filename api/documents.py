@@ -9,7 +9,7 @@ from pydantic import BaseModel
 from .client import GeminiClient
 
 
-router = APIRouter(prefix='/stores', tags=['documents'])
+router = APIRouter(prefix='/api/stores', tags=['documents'])
 
 
 @router.post('/{store_id}/upload')

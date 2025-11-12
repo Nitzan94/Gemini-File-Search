@@ -29,7 +29,7 @@
 
 <div class="card">
     <h2>Documents</h2>
-    <div id="documents-list" hx-get="/stores/{{ store_id }}/documents" hx-trigger="load, documentUploaded from:body" hx-swap="innerHTML">
+    <div id="documents-list" hx-get="/api/stores/{{ store_id }}/documents" hx-trigger="load, documentUploaded from:body" hx-swap="innerHTML">
         <div class="loading">Loading documents...</div>
     </div>
 </div>
@@ -40,7 +40,7 @@ const storeId = '{{ store_id }}';
 // Load store info
 async function loadStoreInfo() {
     try {
-        const response = await fetch(`/stores/${storeId}`);
+        const response = await fetch(`/api/stores/${storeId}`);
         const store = await response.json();
 
         const container = document.getElementById('store-info');
@@ -101,7 +101,7 @@ async function handleFiles(files) {
         progressDiv.appendChild(progressItem);
 
         try {
-            const response = await fetch(`/stores/${storeId}/upload`, {
+            const response = await fetch(`/api/stores/${storeId}/upload`, {
                 method: 'POST',
                 body: formData
             });
@@ -131,7 +131,7 @@ async function pollOperation(operationName, progressItem, fileName) {
 
     const interval = setInterval(async () => {
         try {
-            const response = await fetch(`/stores/operations/${encodeURIComponent(operationName)}`);
+            const response = await fetch(`/api/stores/operations/${encodeURIComponent(operationName)}`);
             const operation = await response.json();
 
             if (operation.done) {
@@ -157,7 +157,7 @@ async function performSearch() {
     resultsDiv.innerHTML = '<div class="loading">Searching...</div>';
 
     try {
-        const response = await fetch('/query', {
+        const response = await fetch('/api/query', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
@@ -202,7 +202,7 @@ async function deleteDocument(docName) {
     const docId = parts[parts.length - 1];
 
     try {
-        const response = await fetch(`/stores/${storeId}/documents/${docId}`, {
+        const response = await fetch(`/api/stores/${storeId}/documents/${docId}`, {
             method: 'DELETE'
         });
 

@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from .client import GeminiClient
 
 
-router = APIRouter(prefix='/stores', tags=['stores'])
+router = APIRouter(prefix='/api/stores', tags=['stores'])
 
 
 class CreateStoreRequest(BaseModel):

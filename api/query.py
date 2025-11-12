@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from .client import GeminiClient
 
 
-router = APIRouter(prefix='/query', tags=['query'])
+router = APIRouter(prefix='/api/query', tags=['query'])
 
 
 class QueryRequest(BaseModel):

@@ -18,7 +18,7 @@
     </div>
 </div>
 
-<div id="stores-list" hx-get="/stores" hx-trigger="load, storeCreated from:body" hx-swap="innerHTML">
+<div id="stores-list" hx-get="/api/stores" hx-trigger="load, storeCreated from:body" hx-swap="innerHTML">
     <div class="loading">Loading stores...</div>
 </div>
 
@@ -36,7 +36,7 @@ async function createStore() {
     const displayName = document.getElementById('store-name').value;
 
     try {
-        const response = await fetch('/stores', {
+        const response = await fetch('/api/stores', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ display_name: displayName || null })
@@ -62,7 +62,7 @@ async function deleteStore(storeName, force = false) {
     const storeId = storeName.split('/')[1];
 
     try {
-        const response = await fetch(`/stores/${storeId}?force=${force}`, {
+        const response = await fetch(`/api/stores/${storeId}?force=${force}`, {
             method: 'DELETE'
         });
 

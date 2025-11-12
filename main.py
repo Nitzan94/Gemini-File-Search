@@ -37,15 +37,16 @@ app.include_router(query_router)
 @app.get('/', response_class=HTMLResponse)
 async def dashboard(request: Request):
     """Dashboard page with stores list"""
-    return templates.TemplateResponse('dashboard.html', {'request': request})
+    return templates.TemplateResponse(request, 'dashboard.html')
 
 
 @app.get('/stores/{store_id}', response_class=HTMLResponse)
 async def store_detail(request: Request, store_id: str):
     """Store detail page with documents and query interface"""
     return templates.TemplateResponse(
+        request,
         'store_detail.html',
-        {'request': request, 'store_id': store_id}
+        {'store_id': store_id}
     )
 
 

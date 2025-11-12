@@ -3,7 +3,11 @@
 
 import os
 import pytest
+from dotenv import load_dotenv
 from fastapi.testclient import TestClient
+
+# Load environment variables
+load_dotenv()
 
 
 @pytest.fixture
@@ -20,7 +24,7 @@ def client():
 @pytest.fixture
 def test_store(client):
     """Create test store and clean up after"""
-    response = client.post('/stores', json={'display_name': 'Test Store'})
+    response = client.post('/api/stores', json={'display_name': 'Test Store'})
     assert response.status_code == 200
     store_data = response.json()
     store_id = store_data['name'].split('/')[1]
@@ -28,12 +32,12 @@ def test_store(client):
     yield store_id
 
     # Cleanup
-    client.delete(f'/stores/{store_id}?force=true')
+    client.delete(f'/api/stores/{store_id}?force=true')
 
 
 def test_create_store(client):
     """Test creating a store"""
-    response = client.post('/stores', json={'display_name': 'My Test Store'})
+    response = client.post('/api/stores', json={'display_name': 'My Test Store'})
     assert response.status_code == 200
 
     data = response.json()
@@ -42,18 +46,18 @@ def test_create_store(client):
 
     # Cleanup
     store_id = data['name'].split('/')[1]
-    client.delete(f'/stores/{store_id}?force=true')
+    client.delete(f'/api/stores/{store_id}?force=true')
 
 
 def test_list_stores(client):
     """Test listing stores"""
     # Create test store
-    create_response = client.post('/stores', json={'display_name': 'List Test'})
+    create_response = client.post('/api/stores', json={'display_name': 'List Test'})
     assert create_response.status_code == 200
     store_id = create_response.json()['name'].split('/')[1]
 
     # List stores
-    response = client.get('/stores')
+    response = client.get('/api/stores')
     assert response.status_code == 200
 
     data = response.json()
@@ -61,12 +65,12 @@ def test_list_stores(client):
     assert len(data['stores']) > 0
 
     # Cleanup
-    client.delete(f'/stores/{store_id}?force=true')
+    client.delete(f'/api/stores/{store_id}?force=true')
 
 
 def test_get_store(client, test_store):
     """Test getting single store with metrics"""
-    response = client.get(f'/stores/{test_store}')
+    response = client.get(f'/api/stores/{test_store}')
     assert response.status_code == 200
 
     data = response.json()
@@ -79,16 +83,16 @@ def test_get_store(client, test_store):
 def test_delete_store(client):
     """Test deleting store"""
     # Create store
-    create_response = client.post('/stores', json={'display_name': 'Delete Me'})
+    create_response = client.post('/api/stores', json={'display_name': 'Delete Me'})
     assert create_response.status_code == 200
     store_id = create_response.json()['name'].split('/')[1]
 
     # Delete store
-    response = client.delete(f'/stores/{store_id}?force=true')
+    response = client.delete(f'/api/stores/{store_id}?force=true')
     assert response.status_code == 200
 
     # Verify deleted
-    get_response = client.get(f'/stores/{store_id}')
+    get_response = client.get(f'/api/stores/{store_id}')
     assert get_response.status_code == 404
 
 
@@ -100,7 +104,7 @@ def test_upload_document(client, test_store, tmp_path):
 
     with open(test_file, 'rb') as f:
         response = client.post(
-            f'/stores/{test_store}/upload',
+            f'/api/stores/{test_store}/upload',
             files={'file': ('test.txt', f, 'text/plain')},
             data={'display_name': 'Test Document'}
         )
@@ -113,7 +117,7 @@ def test_upload_document(client, test_store, tmp_path):
 
 def test_list_documents(client, test_store):
     """Test listing documents in store"""
-    response = client.get(f'/stores/{test_store}/documents')
+    response = client.get(f'/api/stores/{test_store}/documents')
     assert response.status_code == 200
 
     data = response.json()

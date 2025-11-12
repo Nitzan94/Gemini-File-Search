@@ -77,19 +77,19 @@ class GeminiClient:
 
     def list_documents(self, store_name: str, page_size: int = 10):
         """List documents in store"""
-        return self._client.file_search_stores.list_documents(
-            file_search_store_name=store_name,
+        return self._client.file_search_stores.documents.list(
+            parent=store_name,
             config={'page_size': page_size}
         )
 
     def get_document(self, document_name: str):
         """Get document by name"""
-        return self._client.file_search_stores.get_document(name=document_name)
+        return self._client.file_search_stores.documents.get(name=document_name)
 
     def delete_document(self, document_name: str, force: bool = True):
         """Delete document (force=True if has chunks)"""
         config = {'force': force} if force else {}
-        return self._client.file_search_stores.delete_document(
+        return self._client.file_search_stores.documents.delete(
             name=document_name,
             config=config
         )
@@ -109,7 +109,7 @@ class GeminiClient:
         if metadata_filters:
             config['metadata_filters'] = metadata_filters
 
-        return self._client.file_search_stores.query_document(
+        return self._client.file_search_stores.documents.query(
             name=document_name,
             config=config
         )
@@ -141,4 +141,4 @@ class GeminiClient:
     # Operation polling
     def get_operation(self, operation_name: str):
         """Poll long-running operation status"""
-        return self._client.file_search_stores.get_operation(name=operation_name)
+        return self._client.operations.get(name=operation_name)
