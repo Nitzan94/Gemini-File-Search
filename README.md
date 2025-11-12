@@ -59,3 +59,16 @@ Free tier: 1 GB storage, 100 MB per file
 - google-genai SDK
 - HTMX
 - Jinja2
+
+## Documentation
+
+- **[DEVELOPER_GUIDE.md](DEVELOPER_GUIDE.md)** - Complete technical guide: architecture, patterns, common tasks
+- **[Claude Code Skill](gemini-file-search-skill.zip)** - Claude Code skill for building Gemini File Search apps
+  - Install to: `~/.claude/skills/gemini-file-search/`
+  - Teaches RAG patterns, API integration, FastAPI setup, troubleshooting
+
+## Resources
+
+- [Gemini File Search Docs](https://ai.google.dev/gemini-api/docs/file-search)
+- [Get API Key](https://aistudio.google.com/apikey)
+- [Google GenAI SDK](https://github.com/googleapis/python-genai)
