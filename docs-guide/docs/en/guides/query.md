@@ -43,9 +43,8 @@ That's it! You get an answer based on your documents.
 
 ## Understanding the Query Flow
 
-<InteractiveDiagram
-  title="Query Processing Flow"
-  :chart="`sequenceDiagram
+```mermaid
+sequenceDiagram
     participant You
     participant API as Gemini API
     participant Search as File Search
@@ -63,8 +62,7 @@ That's it! You get an answer based on your documents.
     Note over Search: Semantic search<br/>finds meaning,<br/>not just keywords
 
     Note over AI: Reads chunks,<br/>synthesizes answer,<br/>includes citations
-`"
-/>
+```
 
 ### What Happens Behind the Scenes
 

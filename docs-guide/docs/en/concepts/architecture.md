@@ -4,10 +4,8 @@ Understand how Gemini File Search works under the hood.
 
 ## System Architecture
 
-<InteractiveDiagram
-  title="Gemini File Search Architecture"
-  description="Click on components to learn more about each part of the system"
-  :chart="`graph TB
+```mermaid
+graph TB
     A[Your Application] -->|API Calls| B[Gemini File Search API]
     B --> C[File Search Stores]
     C --> D[Documents]
@@ -24,8 +22,7 @@ Understand how Gemini File Search works under the hood.
     style B fill:#4285f4,stroke:#333,stroke-width:2px,color:#fff
     style G fill:#34a853,stroke:#333,stroke-width:2px,color:#fff
     style L fill:#fbbc04,stroke:#333,stroke-width:2px
-`"
-/>
+```
 
 ## Key Components
 
@@ -51,8 +48,8 @@ store = client.file_search_stores.create(
 - Max 100MB per file (free tier)
 - Progress through states: `PENDING` → `ACTIVE` → ready to query
 
-<InteractiveDiagram
-  :chart="`stateDiagram-v2
+```mermaid
+stateDiagram-v2
     [*] --> PENDING: Upload
     PENDING --> ACTIVE: Processing Complete
     PENDING --> FAILED: Error
@@ -67,8 +64,7 @@ store = client.file_search_stores.create(
     note right of ACTIVE
       Can be queried
     end note
-`"
-/>
+```
 
 ### 3. Automatic Chunking
 
@@ -94,10 +90,8 @@ store = client.file_search_stores.create(
 
 ## Data Flow
 
-<InteractiveDiagram
-  title="Query to Answer Flow"
-  description="How your question becomes an answer with citations"
-  :chart="`sequenceDiagram
+```mermaid
+sequenceDiagram
     participant U as User
     participant A as Your App
     participant G as Gemini API
@@ -112,13 +106,12 @@ store = client.file_search_stores.create(
     LLM-->>G: Answer + source references
     G-->>A: Response with citations
     A-->>U: Display answer & sources
-`"
-/>
+```
 
 ## Upload Workflow
 
-<InteractiveDiagram
-  :chart="`flowchart LR
+```mermaid
+flowchart LR
     A[File Selected] --> B{Validate Format}
     B -->|Invalid| C[Error: Unsupported]
     B -->|Valid| D{Check Size}
@@ -133,8 +126,7 @@ store = client.file_search_stores.create(
     style F fill:#4285f4,color:#fff
     style I fill:#34a853,color:#fff
     style J fill:#fbbc04
-`"
-/>
+```
 
 ## Storage Tiers
 

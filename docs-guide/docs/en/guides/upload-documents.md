@@ -47,9 +47,8 @@ operation = client.file_search_stores.upload_to_file_search_store(
 
 ## Understanding the Upload Flow
 
-<InteractiveDiagram
-  title="Upload and Processing Flow"
-  :chart="`sequenceDiagram
+```mermaid
+sequenceDiagram
     participant You
     participant API as Gemini API
     participant Store as File Search Store
@@ -72,8 +71,7 @@ operation = client.file_search_stores.upload_to_file_search_store(
     API->>Store: Search
     Store-->>API: Relevant chunks
     API-->>You: Answer + Citations
-`"
-/>
+```
 
 ### What Happens Behind the Scenes
 

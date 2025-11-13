@@ -11,9 +11,8 @@ A **store** is a container for your documents - think of it like a folder or dat
 - Tracks metrics (document counts, storage size)
 - Can be queried independently or together with other stores
 
-<InteractiveDiagram
-  title="Store Hierarchy"
-  :chart="`graph TB
+```mermaid
+graph TB
     A[Your Application] --> B[Store 1: Project Docs]
     A --> C[Store 2: Financial Reports]
     A --> D[Store 3: Customer Data]
@@ -30,8 +29,7 @@ A **store** is a container for your documents - think of it like a folder or dat
     style B fill:#4285f4,color:#fff
     style C fill:#34a853,color:#fff
     style D fill:#fbbc04,color:#333
-`"
-/>
+```
 
 ## Creating a Store
 

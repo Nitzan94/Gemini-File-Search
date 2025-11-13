@@ -46,9 +46,8 @@ Gemini File Search always:
 
 ## How Citations Work
 
-<InteractiveDiagram
-  title="Citation Flow"
-  :chart="`flowchart TB
+```mermaid
+flowchart TB
     Q[Your Question:<br/>'What was Q2 revenue?'] --> S[Search Documents]
     S --> F1[Find: Q2 Report p.3:<br/>'Revenue: $50M']
     S --> F2[Find: Board Notes:<br/>'Exceeded targets']
@@ -62,8 +61,7 @@ Gemini File Search always:
     style R fill:#34a853,color:#fff
     style C1 fill:#fbbc04,color:#333
     style C2 fill:#fbbc04,color:#333
-`"
-/>
+```
 
 ### What You Get
 

@@ -57,12 +57,6 @@ export default defineConfig({
               ]
             },
             {
-              text: 'Tutorial',
-              items: [
-                { text: 'Interactive Wizard', link: '/en/tutorial/' }
-              ]
-            },
-            {
               text: 'Troubleshooting',
               items: [
                 { text: 'Common Issues', link: '/en/troubleshooting' }
@@ -79,61 +73,14 @@ export default defineConfig({
       themeConfig: {
         nav: [
           { text: 'דף הבית', link: '/he/' },
-          { text: 'תחילת העבודה', link: '/he/getting-started/setup' },
-          { text: 'מדריך אינטראקטיבי', link: '/he/tutorial/' },
-          { text: 'תיעוד API', link: '/he/api/stores' }
+          { text: 'English Documentation', link: '/' }
         ],
         sidebar: {
           '/he/': [
             {
-              text: 'תחילת העבודה',
-              collapsed: false,
+              text: 'בקרוב',
               items: [
-                { text: 'התקנה והגדרה', link: '/he/getting-started/setup' },
-                { text: 'יצירת מאגר ראשון', link: '/he/getting-started/first-store' },
-                { text: 'שאילתה ראשונה', link: '/he/getting-started/first-query' }
-              ]
-            },
-            {
-              text: 'מושגי יסוד',
-              collapsed: false,
-              items: [
-                { text: 'ארכיטקטורה', link: '/he/concepts/architecture' },
-                { text: 'מאגרים', link: '/he/concepts/stores' },
-                { text: 'מסמכים', link: '/he/concepts/documents' },
-                { text: 'חיפוש סמנטי', link: '/he/concepts/semantic-search' },
-                { text: 'ציטוטים', link: '/he/concepts/citations' }
-              ]
-            },
-            {
-              text: 'מדריכים מעשיים',
-              collapsed: false,
-              items: [
-                { text: 'העלאת מסמכים', link: '/he/guides/upload-documents' },
-                { text: 'סינון לפי מטא-דאטא', link: '/he/guides/metadata-filtering' },
-                { text: 'אינטגרציה עם FastAPI', link: '/he/guides/fastapi-integration' },
-                { text: 'פריסה לייצור', link: '/he/guides/production-deployment' }
-              ]
-            },
-            {
-              text: 'תיעוד API',
-              collapsed: false,
-              items: [
-                { text: 'מאגרים', link: '/he/api/stores' },
-                { text: 'מסמכים', link: '/he/api/documents' },
-                { text: 'שאילתות', link: '/he/api/query' }
-              ]
-            },
-            {
-              text: 'מדריך אינטראקטיבי',
-              items: [
-                { text: 'אשף צעד-אחר-צעד', link: '/he/tutorial/' }
-              ]
-            },
-            {
-              text: 'פתרון בעיות',
-              items: [
-                { text: 'בעיות נפוצות', link: '/he/troubleshooting' }
+                { text: 'התיעוד בעברית בפיתוח', link: '/he/' }
               ]
             }
           ]

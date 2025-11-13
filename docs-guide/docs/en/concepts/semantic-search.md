@@ -75,9 +75,8 @@ Even though you didn't use those exact words!
 
 ### Traditional Search vs Semantic Search
 
-<InteractiveDiagram
-  title="Search Comparison"
-  :chart="`graph TB
+```mermaid
+graph TB
     subgraph Traditional["❌ Traditional Keyword Search"]
         A1[Search: 'revenue'] --> B1[Find exact word 'revenue']
         B1 --> C1[Miss: income, sales, earnings]
@@ -90,8 +89,7 @@ Even though you didn't use those exact words!
 
     style Semantic fill:#34a853,color:#fff
     style Traditional fill:#ea4335,color:#fff
-`"
-/>
+```
 
 **Example Scenarios:**
 
@@ -135,9 +133,8 @@ Think of it as:
 
 ### The Flow
 
-<InteractiveDiagram
-  title="How RAG Works"
-  :chart="`flowchart LR
+```mermaid
+flowchart LR
     Q[Your Question:<br/>'What was Q2 revenue?'] --> S[Search Documents]
     S --> F[Find Relevant Chunks:<br/>- Q2 Report page 3<br/>- Meeting notes<br/>- Dashboard]
     F --> A[AI Reads Chunks]
@@ -147,8 +144,7 @@ Think of it as:
     style Q fill:#4285f4,color:#fff
     style G fill:#34a853,color:#fff
     style C fill:#fbbc04,color:#333
-`"
-/>
+```
 
 ### Why RAG is Powerful
 
@@ -185,9 +181,8 @@ That's it.
 
 ### The Technology Stack
 
-<InteractiveDiagram
-  title="Gemini File Search Architecture"
-  :chart="`graph TB
+```mermaid
+graph TB
     U[You Upload<br/>Documents] --> G[Google Gemini]
 
     subgraph Google["🔒 Google Handles Everything"]
@@ -204,8 +199,7 @@ That's it.
     style Google fill:#f0f0f0
     style G fill:#4285f4,color:#fff
     style Y fill:#34a853,color:#fff
-`"
-/>
+```
 
 ### Supported File Types (100+)
 

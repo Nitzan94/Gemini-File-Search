@@ -4,8 +4,8 @@ Understanding document lifecycle, states, and formats.
 
 ## Document Lifecycle
 
-<InteractiveDiagram
-  :chart="`stateDiagram-v2
+```mermaid
+stateDiagram-v2
     [*] --> Upload: upload_to_file_search_store()
     Upload --> PENDING: Processing Started
     PENDING --> ACTIVE: Chunks + Embeddings Done
@@ -21,8 +21,7 @@ Understanding document lifecycle, states, and formats.
     note right of ACTIVE
       Can be queried
     end note
-`"
-/>
+```
 
 ## Document States
 

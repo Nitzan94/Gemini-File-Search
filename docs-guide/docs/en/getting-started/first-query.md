@@ -6,9 +6,8 @@ Upload a document and run your first semantic search query.
 
 This guide walks through the entire process: upload → wait → query → get answer with citations.
 
-<InteractiveDiagram
-  title="Query Workflow"
-  :chart="`flowchart LR
+```mermaid
+flowchart LR
     A[Create Store] --> B[Upload Document]
     B --> C[Wait for Processing]
     C --> D{Document Active?}
@@ -19,8 +18,7 @@ This guide walks through the entire process: upload → wait → query → get a
     style A fill:#4285f4,color:#fff
     style E fill:#34a853,color:#fff
     style F fill:#fbbc04,color:#333
-`"
-/>
+```
 
 ## Step 1: Create Test Document
 
@@ -378,9 +376,8 @@ print('\\n✓ Cleanup complete!')
 
 ## What Just Happened?
 
-<InteractiveDiagram
-  title="Behind the Scenes"
-  :chart="`sequenceDiagram
+```mermaid
+sequenceDiagram
     participant Y as You
     participant G as Gemini API
     participant VS as Vector Search
@@ -397,8 +394,7 @@ print('\\n✓ Cleanup complete!')
     G->>LLM: Generate answer with context
     LLM-->>G: Answer + citations
     G-->>Y: "Revenue was $210M" + sources
-`"
-/>
+```
 
 **The Process:**
 1. **Chunking**: Document split into semantic chunks
