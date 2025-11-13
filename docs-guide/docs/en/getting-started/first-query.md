@@ -24,10 +24,8 @@ flowchart LR
 
 Let's create a sample document with some information to search:
 
-<CodePlayground
-  title="Create test document"
-  language="python"
-  :code="`# Create a test document with company information
+```python
+# Create a test document with company information
 test_content = '''
 Acme Corp Annual Report 2024
 
@@ -61,18 +59,20 @@ Future Plans:
 with open('acme_report.txt', 'w', encoding='utf-8') as f:
     f.write(test_content)
 
-print('✓ Test document created: acme_report.txt')
-`"
-/>
+print('Test document created: acme_report.txt')
+```
+
+**What this code does:**
+- Creates a sample company report with financial data, employee info, and future plans
+- Saves it as a text file named "acme_report.txt" on your computer
+- This gives us something to test with - you'll upload this file to Gemini and then ask questions about it
 
 ## Step 2: Upload Document
 
 Upload your document to the store:
 
-<CodePlayground
-  title="Upload document to store"
-  language="python"
-  :code="`import os
+```python
+import os
 from google import genai
 
 # Initialize client
@@ -100,17 +100,21 @@ operation = client.file_search_stores.upload_to_file_search_store(
 
 print(f'Upload initiated: {operation.name}')
 print(f'Operation done: {operation.done}')
-`"
-/>
+```
+
+**What this code does:**
+- Lines 1-5: Import tools and connect to Gemini using your API key
+- Lines 8-11: Create a store called "Tutorial Documents" (like creating a new folder)
+- Lines 14-25: Upload the acme_report.txt file to the store and add some labels to it (company name, year, document type)
+- Lines 27-28: Check the upload status - it tells you the operation started and whether it's finished yet
+- Think of this as dropping a file into a folder and labeling it so you can find it later
 
 ## Step 3: Wait for Processing
 
 Documents must reach `STATE_ACTIVE` before querying:
 
-<CodePlayground
-  title="Poll until document is ready"
-  language="python"
-  :code="`import time
+```python
+import time
 
 # Poll operation status
 print('Waiting for document processing...')
@@ -120,14 +124,14 @@ attempts = 0
 while not operation.done and attempts < max_attempts:
     operation = client.operations.get(name=operation.name)
     if operation.done:
-        print('✓ Processing complete!')
+        print('Processing complete!')
         break
     print(f'  Still processing... ({attempts * 2}s)')
     time.sleep(2)
     attempts += 1
 
 if not operation.done:
-    print('✗ Timeout: Processing took longer than expected')
+    print('Timeout: Processing took longer than expected')
     exit(1)
 
 # Verify document is active
@@ -136,19 +140,26 @@ documents = client.file_search_stores.documents.list(
 )
 
 for doc in documents:
-    print(f'\\nDocument: {doc.display_name}')
+    print(f'\nDocument: {doc.display_name}')
     print(f'  State: {doc.state}')
     print(f'  Size: {doc.size_bytes:,} bytes')
     print(f'  MIME Type: {doc.mime_type}')
 
     if doc.state == 'STATE_ACTIVE':
-        print('  ✓ Ready to query!')
+        print('  Ready to query!')
     elif doc.state == 'STATE_PENDING':
-        print('  ⏳ Still processing...')
+        print('  Still processing...')
     elif doc.state == 'STATE_FAILED':
-        print('  ✗ Processing failed')
-`"
-/>
+        print('  Processing failed')
+```
+
+**What this code does:**
+- After uploading, Gemini needs time to process your document (read it, break it into chunks, analyze it)
+- Lines 6-16: Check every 2 seconds if processing is done, up to 30 tries (60 seconds total)
+- Lines 18-20: If it takes longer than 60 seconds, give up and show an error
+- Lines 23-37: Get the list of documents in your store and check their status
+- Shows if each document is ready (ACTIVE), still processing (PENDING), or had a problem (FAILED)
+- Like waiting for a file to finish uploading before you can use it
 
 :::tip Processing Time
 - Small files (<1MB): 5-10 seconds
@@ -160,10 +171,8 @@ for doc in documents:
 
 Now ask questions in natural language:
 
-<CodePlayground
-  title="Query with semantic search"
-  language="python"
-  :code="`from google.genai import types
+```python
+from google.genai import types
 
 # Ask a question
 response = client.models.generate_content(
@@ -179,7 +188,7 @@ response = client.models.generate_content(
 )
 
 # Print the answer
-print('\\n' + '='*60)
+print('\n' + '='*60)
 print('ANSWER:')
 print('='*60)
 print(response.text)
@@ -188,17 +197,23 @@ print('='*60)
 # Expected output:
 # According to the Acme Corp Annual Report 2024,
 # the total annual revenue was $210 million.
-`"
-/>
+```
+
+**What this code does:**
+- Now the fun part - ask Gemini a question about your document in plain English
+- Lines 4-14: Send your question to Gemini and tell it to search your store for the answer
+- The model is "gemini-2.5-flash" - this is the AI that will read your documents and answer
+- Line 7: Your question in natural language - no special syntax needed
+- Lines 9-12: Tell Gemini which store to search (the one you just uploaded to)
+- Lines 17-21: Display the answer nicely formatted
+- Gemini reads through your document, finds the relevant information, and gives you an answer
 
 ## Step 5: Extract Citations
 
 Get sources for the answer:
 
-<CodePlayground
-  title="Safe citation extraction"
-  language="python"
-  :code="`# Extract citations with safe attribute checking
+```python
+# Extract citations with safe attribute checking
 citations = []
 
 if hasattr(response, 'candidates') and response.candidates:
@@ -216,25 +231,30 @@ if hasattr(response, 'candidates') and response.candidates:
 
 # Display citations
 if citations:
-    print('\\nSOURCES:')
+    print('\nSOURCES:')
     print('-' * 60)
     for i, citation in enumerate(citations, 1):
-        print(f'{i}. {citation[\"title\"]}')
+        print(f'{i}. {citation["title"]}')
         if citation['uri']:
-            print(f'   URI: {citation[\"uri\"]}')
+            print(f'   URI: {citation["uri"]}')
 else:
-    print('\\nNo citations found (answer may be from model knowledge)')
-`"
-/>
+    print('\nNo citations found (answer may be from model knowledge)')
+```
+
+**What this code does:**
+- After getting an answer, you want to know WHERE that information came from
+- Lines 2-15: Dig into the response to find which documents Gemini used to answer your question
+- It looks through the response structure for "grounding" information - these are the sources
+- Lines 18-26: Display the sources nicely - shows document titles and links
+- Like footnotes in a research paper - proves the answer came from your documents, not just made up
+- If no citations found, it means Gemini answered from its general knowledge instead of your files
 
 ## Try Different Queries
 
 Let's ask various types of questions:
 
-<CodePlayground
-  title="Multiple query examples"
-  language="python"
-  :code="`queries = [
+```python
+queries = [
     'What was the Q2 revenue?',
     'How many employees does Acme Corp have?',
     'What are the future plans for 2025?',
@@ -243,7 +263,7 @@ Let's ask various types of questions:
 ]
 
 for query in queries:
-    print(f'\\n{"="*60}')
+    print(f'\n{"="*60}')
     print(f'Q: {query}')
     print('-' * 60)
 
@@ -260,17 +280,21 @@ for query in queries:
     )
 
     print(f'A: {response.text}')
-`"
-/>
+```
+
+**What this code does:**
+- Creates a list of different questions to ask about the document
+- Goes through each question one by one and gets an answer from Gemini
+- Shows both the question and answer in a formatted way
+- Demonstrates that you can ask different types of questions: specific numbers, counts, future plans, ratings
+- Like having a conversation with your documents - ask anything and get answers instantly
 
 ## Query with Metadata Filters
 
 Filter searches by custom metadata:
 
-<CodePlayground
-  title="Query with metadata filter"
-  language="python"
-  :code="`# Query only documents from 2024 annual reports
+```python
+# Query only documents from 2024 annual reports
 response = client.models.generate_content(
     model='gemini-2.5-flash',
     contents='What was the annual revenue?',
@@ -286,8 +310,14 @@ response = client.models.generate_content(
 )
 
 print(response.text)
-`"
-/>
+```
+
+**What this code does:**
+- Remember those labels we added when uploading (year, type, company)? Now we can use them to filter
+- Line 11: Only search documents that have year=2024 AND type=annual-report
+- If you have many documents in one store, filters help narrow down which ones to search
+- Like telling a librarian "only look in the 2024 annual reports section" instead of searching the whole library
+- Makes searches faster and more accurate when you have lots of documents
 
 **Filter Syntax:**
 - `AND`: `key1=value1 AND key2=value2`
@@ -298,10 +328,8 @@ print(response.text)
 
 Here's everything together in one runnable script:
 
-<CodePlayground
-  title="complete_query_example.py"
-  language="python"
-  :code="`import os
+```python
+import os
 import time
 from google import genai
 from google.genai import types
@@ -336,7 +364,7 @@ operation = client.file_search_stores.upload_to_file_search_store(
 while not operation.done:
     operation = client.operations.get(name=operation.name)
     time.sleep(2)
-print('✓ Document ready!')
+print('Document ready!')
 
 # 4. Query
 response = client.models.generate_content(
@@ -351,7 +379,7 @@ response = client.models.generate_content(
     )
 )
 
-print(f'\\nAnswer: {response.text}')
+print(f'\nAnswer: {response.text}')
 
 # 5. Extract citations
 if hasattr(response, 'candidates') and response.candidates:
@@ -359,20 +387,30 @@ if hasattr(response, 'candidates') and response.candidates:
     if hasattr(candidate, 'grounding_metadata'):
         grounding = candidate.grounding_metadata
         if hasattr(grounding, 'grounding_chunks'):
-            print('\\nCitations:')
+            print('\nCitations:')
             for chunk in grounding.grounding_chunks:
                 if hasattr(chunk, 'retrieved_context'):
                     ctx = chunk.retrieved_context
-                    print(f'  - {getattr(ctx, \"title\", \"\")}')
+                    print(f'  - {getattr(ctx, "title", "")}')
 
 # 6. Cleanup
 client.file_search_stores.delete(
     name=store.name,
     config={'force': True}
 )
-print('\\n✓ Cleanup complete!')
-`"
-/>
+print('\nCleanup complete!')
+```
+
+**What this code does:**
+- This is a complete working example that ties together all the previous steps
+- Lines 1-9: Import libraries and set up connection to Gemini
+- Lines 11-18: Create a simple test document
+- Lines 20-30: Create a store and upload the document
+- Lines 32-35: Wait for processing to finish
+- Lines 37-49: Ask a question and get an answer
+- Lines 51-62: Extract and show citations
+- Lines 64-68: Clean up by deleting the test store
+- You can copy this entire script and run it as-is to see the full workflow in action
 
 ## What Just Happened?
 
@@ -494,7 +532,7 @@ response = client.models.generate_content(
 
 ## Next Steps
 
-Congratulations! You've completed your first semantic search with Gemini File Search. 🎉
+Congratulations! You've completed your first semantic search with Gemini File Search.
 
 **Learn More:**
 - **[Understanding Semantic Search →](/en/concepts/semantic-search)**
@@ -539,4 +577,4 @@ response = client.models.generate_content(
 print(response.text)
 ```
 
-Happy querying! 🔍
+Happy querying!

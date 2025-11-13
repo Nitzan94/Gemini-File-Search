@@ -33,10 +33,8 @@ graph TB
 
 ## Creating a Store
 
-<CodePlayground
-  title="Create a basic store"
-  language="python"
-  :code="`from google import genai
+```python
+from google import genai
 import os
 
 # Initialize client
@@ -54,8 +52,14 @@ print(f'Created: {store.create_time}')
 
 # Store name format: fileSearchStores/store-{random-id}
 # Example: fileSearchStores/store-d0ttyrh6580l
-`"
-/>
+```
+
+**What this code does:**
+- Lines 1-2: Import the necessary tools - think of this as getting your toolbox ready
+- Line 5: Connect to Google's Gemini service using your API key (like logging in with a password)
+- Lines 8-10: Ask Gemini to create a new "store" - imagine creating a new folder to organize your documents, and giving it a friendly name "My Project Documentation"
+- Lines 13-15: Display the store's details on screen so you can see what was created
+- The store gets a unique ID (like "fileSearchStores/store-d0ttyrh6580l") - save this, you'll need it later
 
 **Output:**
 ```
@@ -74,10 +78,8 @@ Save the `store.name` value - you'll need it for uploading documents and queryin
 
 Best for isolated projects with distinct document sets.
 
-<CodePlayground
-  title="Project-based stores"
-  language="python"
-  :code="`# Create separate stores for different projects
+```python
+# Create separate stores for different projects
 website_docs = client.file_search_stores.create(
     config={'display_name': 'Website Documentation'}
 )
@@ -93,8 +95,12 @@ internal_docs = client.file_search_stores.create(
 print(f'Website: {website_docs.name}')
 print(f'API: {api_docs.name}')
 print(f'Internal: {internal_docs.name}')
-`"
-/>
+```
+
+**What this code does:**
+- Creates three separate stores, like creating three different filing cabinets
+- Each store is for a specific purpose: one for website docs, one for API docs, one for internal wiki
+- Displays the unique ID for each store so you can keep track of them
 
 **Pros:**
 - Clear separation
@@ -109,10 +115,8 @@ print(f'Internal: {internal_docs.name}')
 
 Best for related documents that need cross-category search.
 
-<CodePlayground
-  title="Single store with metadata filtering"
-  language="python"
-  :code="`# Create one store for all company docs
+```python
+# Create one store for all company docs
 company_docs = client.file_search_stores.create(
     config={'display_name': 'All Company Documents'}
 )
@@ -132,8 +136,13 @@ client.file_search_stores.upload_to_file_search_store(
 
 # Later, query with filters
 # metadata_filter='category=website AND department=engineering'
-`"
-/>
+```
+
+**What this code does:**
+- Creates one big store for all company documents (like one filing cabinet with labeled folders inside)
+- Uploads a document and adds labels/tags to it (category: website, department: engineering)
+- These labels let you filter later - like putting sticky notes on files to find them easier
+- You can search just within specific categories without creating separate stores
 
 **Pros:**
 - Query across all documents
@@ -148,11 +157,9 @@ client.file_search_stores.upload_to_file_search_store(
 
 Best for multi-tenant applications with user isolation.
 
-<CodePlayground
-  title="User-specific stores"
-  language="python"
-  :code="`def create_user_store(user_id: str):
-    \"\"\"Create a store for a specific user\"\"\"
+```python
+def create_user_store(user_id: str):
+    """Create a store for a specific user"""
     store = client.file_search_stores.create(
         config={'display_name': f'User {user_id} Documents'}
     )
@@ -168,24 +175,27 @@ user_2_store = create_user_store('user-002')
 
 print(f'User 1: {user_1_store.name}')
 print(f'User 2: {user_2_store.name}')
-`"
-/>
+```
+
+**What this code does:**
+- Creates a reusable function that makes a personal store for each user (like giving each person their own locker)
+- When you call the function with a user ID, it creates a store with that user's name
+- Each user gets their own private space where their documents are completely separate from others
+- You'd save the connection between user IDs and store IDs in your database to remember which store belongs to whom
 
 ## Listing Stores
 
 View all your existing stores:
 
-<CodePlayground
-  title="List all stores with metrics"
-  language="python"
-  :code="`# List stores (default page size: 10)
+```python
+# List stores (default page size: 10)
 stores = client.file_search_stores.list(
     config={'page_size': 20}  # Max 20
 )
 
 # Print store information
 for store in stores:
-    print(f'\\n{store.display_name}')
+    print(f'\n{store.display_name}')
     print(f'  Name: {store.name}')
     print(f'  Active Documents: {store.active_documents_count}')
     print(f'  Pending Documents: {store.pending_documents_count}')
@@ -201,17 +211,20 @@ for store in stores:
 #   Failed Documents: 0
 #   Size: 15,728,640 bytes (15.00 MB)
 #   Created: 2024-11-13T10:30:00Z
-`"
-/>
+```
+
+**What this code does:**
+- Asks Gemini for a list of all your stores (up to 20 at a time)
+- Goes through each store one by one and displays its details
+- Shows useful info like how many documents are ready (active), how many are still being processed (pending), and how much storage space it's using
+- Think of it as getting a report card for all your filing cabinets
 
 ## Getting Store Details
 
 Retrieve specific store information:
 
-<CodePlayground
-  title="Get single store details"
-  language="python"
-  :code="`# Get store by name
+```python
+# Get store by name
 store = client.file_search_stores.get(
     name='fileSearchStores/store-abc123'
 )
@@ -225,20 +238,24 @@ print(f'Updated: {store.update_time}')
 
 # Check if store is healthy
 if store.failed_documents_count > 0:
-    print(f'⚠️  Warning: {store.failed_documents_count} documents failed processing')
+    print(f'Warning: {store.failed_documents_count} documents failed processing')
 else:
-    print('✓ All documents processed successfully')
-`"
-/>
+    print('All documents processed successfully')
+```
+
+**What this code does:**
+- Retrieves detailed info about one specific store using its ID
+- Calculates the total number of documents (both ready and still processing)
+- Shows how much storage space is being used in megabytes
+- Checks if any documents failed to upload and warns you if there are problems
+- Like opening a specific filing cabinet and inspecting its contents
 
 ## Deleting Stores
 
 Remove stores you no longer need:
 
-<CodePlayground
-  title="Delete a store"
-  language="python"
-  :code="`# Delete empty store
+```python
+# Delete empty store
 client.file_search_stores.delete(
     name='fileSearchStores/store-abc123'
 )
@@ -249,9 +266,13 @@ client.file_search_stores.delete(
     config={'force': True}  # Cascade delete all documents
 )
 
-print('✓ Store deleted successfully')
-`"
-/>
+print('Store deleted successfully')
+```
+
+**What this code does:**
+- First example: Deletes an empty store (like throwing away an empty folder)
+- Second example: Deletes a store that has documents in it - you need to add `force=True` to confirm you really want to delete everything inside
+- Be careful - this is permanent and can't be undone, like putting files in a shredder
 
 :::warning Irreversible
 Deleting a store is **permanent** and cannot be undone. All documents in the store will be deleted.
@@ -274,14 +295,12 @@ For best performance, keep individual stores under 20 GB. Create multiple stores
 
 ### Pattern: Store Factory
 
-<CodePlayground
-  title="Reusable store creation function"
-  language="python"
-  :code="`def create_project_store(
+```python
+def create_project_store(
     project_name: str,
     description: str = ''
 ) -> str:
-    \"\"\"
+    """
     Create a store for a project and return its name.
 
     Args:
@@ -290,7 +309,7 @@ For best performance, keep individual stores under 20 GB. Create multiple stores
 
     Returns:
         Store name (fileSearchStores/store-xxx)
-    \"\"\"
+    """
     display_name = f'{project_name}'
     if description:
         display_name += f' - {description}'
@@ -299,7 +318,7 @@ For best performance, keep individual stores under 20 GB. Create multiple stores
         config={'display_name': display_name}
     )
 
-    print(f'✓ Created store: {store.display_name}')
+    print(f'Created store: {store.display_name}')
     print(f'  Name: {store.name}')
 
     return store.name
@@ -309,18 +328,22 @@ store_name = create_project_store(
     'Customer Support',
     'FAQs and support documentation'
 )
-`"
-/>
+```
+
+**What this code does:**
+- Creates a helper function to make store creation easier and more consistent
+- Takes a project name and optional description, then creates a store with a nice display name
+- Returns the store ID so you can use it right away
+- The example creates a store called "Customer Support - FAQs and support documentation"
+- Think of it as a template or shortcut for creating stores the same way every time
 
 ### Pattern: Store Cleanup
 
-<CodePlayground
-  title="Delete old or empty stores"
-  language="python"
-  :code="`from datetime import datetime, timedelta
+```python
+from datetime import datetime, timedelta
 
 def cleanup_old_stores(days_old: int = 30):
-    \"\"\"Delete stores older than specified days with no documents\"\"\"
+    """Delete stores older than specified days with no documents"""
     stores = client.file_search_stores.list(config={'page_size': 20})
     deleted_count = 0
 
@@ -333,17 +356,23 @@ def cleanup_old_stores(days_old: int = 30):
         if age > timedelta(days=days_old) and store.active_documents_count == 0:
             try:
                 client.file_search_stores.delete(name=store.name)
-                print(f'✓ Deleted: {store.display_name}')
+                print(f'Deleted: {store.display_name}')
                 deleted_count += 1
             except Exception as e:
-                print(f'✗ Failed to delete {store.display_name}: {e}')
+                print(f'Failed to delete {store.display_name}: {e}')
 
-    print(f'\\nDeleted {deleted_count} old stores')
+    print(f'\nDeleted {deleted_count} old stores')
 
 # Run cleanup
 cleanup_old_stores(days_old=30)
-`"
-/>
+```
+
+**What this code does:**
+- Creates a cleanup function to automatically remove old, unused stores
+- Goes through all your stores and checks when each was created
+- If a store is older than 30 days (you can change this) and has no documents in it, it gets deleted
+- Keeps track of how many stores were deleted and reports any errors
+- Like doing spring cleaning - getting rid of empty folders you haven't used in a month
 
 ## Troubleshooting
 
@@ -412,4 +441,4 @@ store = client.file_search_stores.get(name='fileSearchStores/store-id')
 client.file_search_stores.delete(name='fileSearchStores/store-id', config={'force': True})
 ```
 
-Store your store names - you'll need them for document operations! 💾
+Store your store names - you'll need them for document operations!
