@@ -1,0 +1,11 @@
+ruleDirs:
+  - .ast-grep/rules
+
+ignore:
+  - node_modules
+  - "**/node_modules/**"
+  - "**/.vitepress/cache/**"
+  - "**/.vitepress/dist/**"
+  - "**/dist/**"
+  - "**/build/**"
+  - "**/*.min.js"

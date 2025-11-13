@@ -1,0 +1,149 @@
+/**
+ * RTL (Right-to-Left) styles for Hebrew language support
+ * Automatically applied when html[dir="rtl"]
+ */
+
+html[dir="rtl"] {
+  /* Base RTL adjustments */
+  text-align: right;
+}
+
+html[dir="rtl"] body {
+  direction: rtl;
+}
+
+/* Navigation RTL */
+html[dir="rtl"] .VPNav {
+  direction: rtl;
+}
+
+html[dir="rtl"] .VPNavBar .container {
+  flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .VPMenu,
+html[dir="rtl"] .VPNav Bar .menu {
+  left: auto;
+  right: 0;
+}
+
+/* Sidebar RTL */
+html[dir="rtl"] .VPSidebar {
+  left: auto;
+  right: 0;
+}
+
+html[dir="rtl"] .VPDocAside {
+  right: auto;
+  left: 0;
+}
+
+html[dir="rtl"] .aside-container {
+  padding-right: 0;
+  padding-left: 32px;
+}
+
+/* Content RTL */
+html[dir="rtl"] .vp-doc {
+  padding-left: 32px;
+  padding-right: 0;
+}
+
+html[dir="rtl"] .vp-doc h1,
+html[dir="rtl"] .vp-doc h2,
+html[dir="rtl"] .vp-doc h3 {
+  text-align: right;
+}
+
+html[dir="rtl"] .vp-doc ul,
+html[dir="rtl"] .vp-doc ol {
+  padding-left: 0;
+  padding-right: 1.25rem;
+}
+
+html[dir="rtl"] .vp-doc blockquote {
+  border-left: none;
+  border-right: 2px solid var(--vp-c-divider);
+  padding-left: 0;
+  padding-right: 16px;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* Code blocks RTL */
+html[dir="rtl"] .vp-code-group .tabs {
+  direction: rtl;
+}
+
+html[dir="rtl"] .vp-code-group .tabs label {
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+/* Custom components RTL */
+html[dir="rtl"] .code-playground-header {
+  flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .wizard-navigation {
+  flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .wizard-progress-steps {
+  flex-direction: row-reverse;
+}
+
+/* Search RTL */
+html[dir="rtl"] .VPLocalSearchBox {
+  direction: rtl;
+}
+
+html[dir="rtl"] .search-input {
+  text-align: right;
+}
+
+/* Buttons and links RTL */
+html[dir="rtl"] .VPButton {
+  direction: rtl;
+}
+
+html[dir="rtl"] .vp-doc a {
+  direction: rtl;
+}
+
+/* Mobile adjustments for RTL */
+@media (max-width: 768px) {
+  html[dir="rtl"] .VPSidebar {
+    right: 0;
+    left: auto;
+    transform: translateX(100%);
+  }
+
+  html[dir="rtl"] .VPSidebar.open {
+    transform: translateX(0);
+  }
+
+  html[dir="rtl"] .vp-doc {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
+/* Typography adjustments for Hebrew */
+html[lang="he"] {
+  font-family: 'Noto Sans Hebrew', 'Rubik', Arial, sans-serif;
+  line-height: 1.7; /* Hebrew needs slightly more line height */
+}
+
+html[lang="he"] code,
+html[lang="he"] pre {
+  /* Keep code blocks LTR for readability */
+  direction: ltr;
+  text-align: left;
+}
+
+html[lang="he"] .line-number {
+  /* Line numbers should stay on left in code blocks */
+  left: 0;
+  right: auto;
+}

@@ -1,0 +1,30 @@
+{
+  "name": "gemini-file-search-guide",
+  "version": "1.0.0",
+  "description": "Interactive guide for Gemini File Search API",
+  "type": "module",
+  "scripts": {
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
+  },
+  "keywords": [
+    "gemini",
+    "file-search",
+    "documentation",
+    "guide"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@codemirror/lang-javascript": "^6.2.4",
+    "@codemirror/lang-python": "^6.2.1",
+    "codemirror": "^6.0.2",
+    "mermaid": "^11.12.1",
+    "prismjs": "^1.30.0",
+    "rtlcss": "^4.3.0",
+    "sandpack-vue3": "^3.1.12",
+    "vitepress": "^1.6.4",
+    "vue": "^3.5.24"
+  }
+}

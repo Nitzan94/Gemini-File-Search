@@ -1,0 +1,191 @@
+/**
+ * Main styles for Gemini File Search Guide
+ */
+
+:root {
+  --vp-c-brand-1: #4285f4;
+  --vp-c-brand-2: #5a95f5;
+  --vp-c-brand-3: #6ba3f6;
+  --vp-c-brand-soft: rgba(66, 133, 244, 0.14);
+}
+
+/* Code playground styles */
+.code-playground {
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 1.5rem 0;
+}
+
+.code-playground-header {
+  background-color: var(--vp-c-bg-soft);
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--vp-c-divider);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.code-playground-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.code-playground-body {
+  padding: 1rem;
+}
+
+/* Interactive diagram styles */
+.interactive-diagram {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background-color: var(--vp-c-bg-soft);
+  border-radius: 8px;
+  border: 1px solid var(--vp-c-divider);
+}
+
+.interactive-diagram svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Tutorial wizard styles */
+.tutorial-wizard {
+  margin: 2rem 0;
+  border: 2px solid var(--vp-c-brand-1);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.wizard-progress {
+  background-color: var(--vp-c-bg-soft);
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+
+.wizard-progress-bar {
+  height: 8px;
+  background-color: var(--vp-c-divider);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 1rem;
+}
+
+.wizard-progress-fill {
+  height: 100%;
+  background-color: var(--vp-c-brand-1);
+  transition: width 0.3s ease;
+}
+
+.wizard-content {
+  padding: 2rem;
+}
+
+.wizard-navigation {
+  padding: 1.5rem;
+  background-color: var(--vp-c-bg-soft);
+  border-top: 1px solid var(--vp-c-divider);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.wizard-button {
+  padding: 0.5rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.wizard-button-primary {
+  background-color: var(--vp-c-brand-1);
+  color: white;
+}
+
+.wizard-button-primary:hover {
+  background-color: var(--vp-c-brand-2);
+}
+
+.wizard-button-secondary {
+  background-color: var(--vp-c-bg);
+  border: 1px solid var(--vp-c-divider);
+  color: var(--vp-c-text-1);
+}
+
+.wizard-button-secondary:hover {
+  background-color: var(--vp-c-bg-soft);
+}
+
+.wizard-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Video player styles */
+.video-player {
+  margin: 2rem 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--vp-c-divider);
+}
+
+.video-player video,
+.video-player img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.video-player-caption {
+  padding: 0.75rem 1rem;
+  background-color: var(--vp-c-bg-soft);
+  font-size: 0.9rem;
+  color: var(--vp-c-text-2);
+  text-align: center;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .code-playground-body {
+    padding: 0.5rem;
+  }
+
+  .wizard-content {
+    padding: 1.5rem;
+  }
+
+  .wizard-navigation {
+    padding: 1rem;
+    flex-direction: column;
+  }
+
+  .wizard-button {
+    width: 100%;
+  }
+}
+
+/* Animation utilities */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.slide-enter-active,
+.slide-leave-active {
+  transition: transform 0.3s ease;
+}
+
+.slide-enter-from {
+  transform: translateX(20px);
+}
+
+.slide-leave-to {
+  transform: translateX(-20px);
+}
