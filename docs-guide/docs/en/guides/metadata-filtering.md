@@ -63,6 +63,13 @@ operation = client.file_search_stores.upload_to_file_search_store(
 )
 ```
 
+**What this code does:**
+- Uploads Q2 report with 6 metadata labels attached
+- Each label is a key-value pair (department=Finance, year=2024, etc.)
+- These labels let you filter searches later
+- Think: filing a document with multiple colored stickers for easy finding
+- Later can search "only Finance, Q2, 2024, final documents"
+
 ### Metadata Limits
 
 - **Max 20 key-value pairs** per document
@@ -89,6 +96,13 @@ metadata_filter='year=2024'
 metadata_filter='status=final'
 ```
 
+**What this code does:**
+- First example: Search only Finance department documents
+- Second example: Search only 2024 documents
+- Third example: Search only final (not draft) documents
+- Single condition filters - simplest type
+- Like looking in one specific file drawer
+
 #### AND Operator
 
 ```python
@@ -98,6 +112,13 @@ metadata_filter='department=Finance AND year=2024'
 # Q2 financial reports that are final
 metadata_filter='quarter=Q2 AND category=financial AND status=final'
 ```
+
+**What this code does:**
+- AND means "must match ALL conditions"
+- First: document must be Finance AND 2024 (both required)
+- Second: document must be Q2 AND financial AND final (all 3 required)
+- Narrows search - fewer results but more specific
+- Like "file drawer A AND folder B" - very specific location
 
 #### OR Operator
 
@@ -109,6 +130,13 @@ metadata_filter='department=Finance OR department=HR'
 metadata_filter='quarter=Q1 OR quarter=Q2'
 ```
 
+**What this code does:**
+- OR means "match ANY condition"
+- First: document can be Finance OR HR (either one works)
+- Second: document can be Q1 OR Q2 (either quarter)
+- Broadens search - more results
+- Like "look in drawer A OR drawer B" - multiple locations
+
 #### NOT Operator
 
 ```python
@@ -118,6 +146,13 @@ metadata_filter='status!=draft'
 # Everything except Engineering
 metadata_filter='department!=Engineering'
 ```
+
+**What this code does:**
+- != means "NOT equal to" (exclude)
+- First: Get all documents EXCEPT drafts (finals, archived, etc.)
+- Second: Get all departments EXCEPT Engineering
+- Exclusion filter - removes unwanted results
+- Like "search everywhere EXCEPT this drawer"
 
 ### Complex Filters
 
@@ -130,6 +165,13 @@ metadata_filter='(department=Finance OR department=HR) AND year=2024'
 # Q2 or Q3, but not drafts
 metadata_filter='(quarter=Q2 OR quarter=Q3) AND status!=draft'
 ```
+
+**What this code does:**
+- Parentheses group conditions (like math)
+- First: (Finance OR HR) then narrow to 2024 only
+- Second: (Q2 OR Q3) then exclude drafts
+- Complex logic: multiple conditions combined
+- Like "drawer A or B, but only 2024 folders, and not drafts"
 
 #### Multiple Conditions
 
@@ -158,6 +200,13 @@ custom_metadata = [
 metadata_filter='department=Engineering AND year=2024 AND month=06'
 ```
 
+**What this code does:**
+- First part: Defines metadata structure (department, year, month)
+- Second part: Searches using that exact structure
+- Filters to Engineering + 2024 + June (very specific timeframe)
+- Good for: Companies with many departments needing time-based searches
+- Result: Only June 2024 Engineering documents
+
 **Use case:** Large organization with multiple departments
 
 ### Pattern 2: Project & Status
@@ -173,6 +222,13 @@ custom_metadata = [
 # Query active, high-priority Alpha project docs
 metadata_filter='project=Alpha AND status=active AND priority=high'
 ```
+
+**What this code does:**
+- Metadata structure: project name, status, priority
+- Search filter: only active, high-priority Alpha docs
+- Excludes completed/archived Alpha docs and low-priority items
+- Perfect for: Project tracking where priority and status matter
+- Result: Urgent items needing attention on Project Alpha
 
 **Use case:** Project management system
 
@@ -190,6 +246,13 @@ custom_metadata = [
 metadata_filter='type=contract AND confidential=yes'
 ```
 
+**What this code does:**
+- Metadata for legal docs: type, confidentiality level, retention period
+- Filter searches: only confidential contracts
+- Excludes non-confidential contracts and non-contract docs
+- Use case: Legal teams managing sensitive documents
+- Result: Only high-security contracts that need careful handling
+
 **Use case:** Legal document management
 
 ### Pattern 4: Customer & Product
@@ -205,6 +268,13 @@ custom_metadata = [
 # Query Acme Corp support tickets for Enterprise Plan
 metadata_filter='customer=Acme Corp AND product=Enterprise Plan AND category=support_ticket'
 ```
+
+**What this code does:**
+- Metadata for support: customer name, product, document category
+- Filter searches: Acme Corp + Enterprise Plan + support tickets only
+- Excludes other customers, other products, non-ticket docs
+- Perfect for: Support teams looking up customer-specific issues
+- Result: All support tickets for Acme Corp's Enterprise Plan
 
 **Use case:** Customer support system
 
@@ -230,6 +300,14 @@ response = client.models.generate_content(
 
 print(response.text)
 ```
+
+**What this code does:**
+- Asks "What was total revenue?" but pre-filters to Finance + 2024 only
+- metadata_filter runs BEFORE semantic search begins
+- Only searches Finance 2024 documents, ignores everything else
+- Gets AI-generated answer from filtered documents
+- Prints the answer
+- Result: Revenue answer guaranteed to be from Finance dept, 2024
 
 ### Dynamic Filters Based on User Input
 
@@ -261,6 +339,15 @@ answer = query_with_filter(
 )
 ```
 
+**What this code does:**
+- Creates reusable function that builds filter from parameters
+- Takes question + department + year as inputs
+- Builds filter string dynamically (department=X AND year=Y)
+- Queries with that filter
+- Returns answer text
+- Example usage: asks about Q2 revenue in Finance 2024 documents
+- Benefit: Change department/year without rewriting query code
+
 ### Query Multiple Departments
 
 ```python
@@ -279,6 +366,13 @@ response = client.models.generate_content(
     )
 )
 ```
+
+**What this code does:**
+- Searches across 3 departments simultaneously (Finance, Sales, Marketing)
+- OR means "include any of these departments"
+- Asks for quarterly highlights across all 3 departments
+- Result: Combined insights from Finance + Sales + Marketing
+- Good for: Executive reports that need cross-department view
 
 ## Metadata Strategy
 
@@ -328,6 +422,15 @@ def add_document_metadata(file, department, year, quarter, category, status):
         }
     )
 ```
+
+**What this code does:**
+- First part: Defines company-wide metadata standard (schema)
+- Lists allowed values for each field (Finance/HR/Legal for department, etc.)
+- Ensures consistency - everyone uses same labels
+- Second part: Helper function for uploading with standard metadata
+- Takes file + metadata values, uploads with proper structure
+- Prevents typos and maintains consistency across all uploads
+- Think: Company-wide filing system with standard label colors
 
 ## Performance Benefits
 
@@ -395,6 +498,14 @@ response = client.models.generate_content(
 )
 ```
 
+**What this code does:**
+- Upload phase: Loops through support tickets, uploads each with 5 metadata fields
+- Metadata captures: customer, product, priority, status, category
+- Query phase: Searches for Acme Corp + high priority + open status only
+- Ignores: closed tickets, other customers, low priority items
+- Gets AI summary of only urgent open Acme Corp issues
+- Perfect for: Support teams triaging customer problems
+
 ### Example 2: Legal Document Search
 
 ```python
@@ -429,6 +540,14 @@ response = client.models.generate_content(
     )
 )
 ```
+
+**What this code does:**
+- Upload: Loops through contracts, uploads with legal metadata
+- Metadata: type, counterparty, year, status, value tier (high/medium/low)
+- Query: Filters to contract + active + 2024 + high value only
+- Ignores: expired contracts, low value, old years
+- Gets AI analysis of key terms in major active 2024 contracts
+- Use case: Legal teams reviewing high-value active agreements
 
 ### Example 3: Research Paper Library
 
@@ -465,6 +584,14 @@ response = client.models.generate_content(
 )
 ```
 
+**What this code does:**
+- Upload: Academic papers with research metadata
+- Metadata: author, year, field, peer review status, citation tier
+- Query: Filters to ML + peer reviewed + 2023/2024 + highly cited
+- Excludes: non-peer-reviewed, old papers, low citations, other fields
+- Asks about neural architecture breakthroughs in recent high-quality papers
+- Perfect for: Researchers doing literature reviews on specific topics
+
 ## Troubleshooting
 
 ### Filter Returns No Results
@@ -481,6 +608,13 @@ docs = client.file_search_stores.documents.list(parent=store.name)
 for doc in docs:
     print(f'{doc.display_name}: {doc.custom_metadata}')
 ```
+
+**What this code does:**
+- Lists all documents in your store
+- For each document, prints name + all metadata labels
+- Helps debug: "Why isn't my filter working?"
+- Shows exact metadata values (check spelling, case, etc.)
+- Use when: Filter returns nothing and you're not sure why
 
 ### Filter Syntax Error
 

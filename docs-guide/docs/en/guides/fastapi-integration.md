@@ -91,6 +91,15 @@ if __name__ == '__main__':
     uvicorn.run(app, host='127.0.0.1', port=8000)
 ```
 
+**What this code does:**
+- Creates FastAPI web application for document search
+- Loads API key from environment (secure)
+- Initializes Gemini client once at startup
+- Home endpoint (/): Returns simple welcome message
+- Stores endpoint (/stores): Lists all your document stores with names and doc counts
+- Main block: Runs web server on localhost port 8000
+- Result: RESTful API for accessing your document search
+
 Run it:
 ```bash
 python main.py
@@ -123,6 +132,15 @@ def create_store(request: CreateStoreRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 ```
+
+**What this code does:**
+- Defines request model: requires display_name field
+- POST /stores endpoint: Creates new document store
+- Takes store name from request body (JSON)
+- Creates store via Gemini API
+- Returns store ID and name in response
+- Error handling: Returns 500 error if creation fails
+- Think: "Create new library" endpoint
 
 ### Upload Document
 
@@ -176,6 +194,16 @@ async def upload_document(
         os.unlink(tmp_path)
 ```
 
+**What this code does:**
+- POST /stores/{store_id}/documents endpoint: Upload file to specific store
+- Accepts file upload (multipart/form-data) from web browser/client
+- Saves uploaded file temporarily to disk
+- Uploads temp file to Gemini store
+- Waits up to 60 seconds for processing (polls every 2 seconds)
+- Returns document info (name, state) when done
+- Cleanup: Deletes temp file after upload (even if error)
+- Timeout protection: Returns 408 if processing takes too long
+
 ### Query Documents
 
 ```python
@@ -223,6 +251,16 @@ def query_documents(request: QueryRequest):
         raise HTTPException(status_code=500, detail=str(e))
 ```
 
+**What this code does:**
+- POST /query endpoint: Ask questions and get answers
+- Request model: question, store_id, optional metadata_filter
+- Builds store name from store_id
+- Queries Gemini with file search enabled
+- Extracts citations from response (document names + relevance scores)
+- Returns JSON with answer text and list of source citations
+- Error handling: Returns 500 if query fails
+- Think: Main "ask a question" endpoint for your app
+
 ### List Documents
 
 ```python
@@ -249,6 +287,14 @@ def list_documents(store_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 ```
 
+**What this code does:**
+- GET /stores/{store_id}/documents endpoint: List all docs in store
+- Takes store_id from URL path
+- Fetches all documents from that store
+- Returns list with doc info: name, display name, state, size, creation time
+- Good for: Showing user what documents are in their store
+- Error handling: Returns 500 if listing fails
+
 ### Delete Store
 
 ```python
@@ -265,6 +311,15 @@ def delete_store(store_id: str, force: bool = False):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 ```
+
+**What this code does:**
+- DELETE /stores/{store_id} endpoint: Delete a store
+- Takes store_id from URL, optional force parameter
+- force=True: Delete even if store has documents
+- force=False (default): Only delete if empty
+- Calls Gemini API to delete store
+- Returns success message
+- Warning: Permanent deletion, use with caution
 
 ## Adding a Web Interface
 
@@ -333,6 +388,15 @@ app.mount('/static', StaticFiles(directory=str(BASE_DIR / 'static')), name='stat
 def home_page(request: Request):
     return templates.TemplateResponse('index.html', {'request': request})
 ```
+
+**What this code does:**
+- Sets up web interface (HTML templates + static files)
+- BASE_DIR: Gets directory where main.py lives
+- Templates: Loads HTML files from templates/ folder
+- Static files: Serves CSS, JS, images from static/ folder
+- Home page endpoint: Returns rendered HTML template
+- Turns API into full web application with UI
+- Users can upload/query through browser instead of API calls
 
 ### JavaScript for Interactivity
 

@@ -31,6 +31,13 @@ operation = client.file_search_stores.upload_to_file_search_store(
 )
 ```
 
+**What this code does:**
+- Loads your API key from environment variables (secure storage)
+- Creates a connection to Gemini's API
+- Sends report.pdf to your existing store (think: uploading to a library)
+- Returns an operation object (like a tracking number) to monitor progress
+- The file immediately starts uploading and processing in the background
+
 That's it! The file is now uploading and processing.
 
 ### With Custom Name
@@ -44,6 +51,12 @@ operation = client.file_search_stores.upload_to_file_search_store(
     }
 )
 ```
+
+**What this code does:**
+- Uploads a file with ugly filename (Q2_Final_Report_v3.pdf)
+- Sets a clean, readable display name (Q2 2024 Financial Report)
+- Display name is what you'll see in search results and logs
+- Actual filename stays the same, but display name makes everything clearer
 
 ## Understanding the Upload Flow
 
@@ -125,6 +138,13 @@ while not operation.done:
 print('Upload complete! Document is ready.')
 ```
 
+**What this code does:**
+- Starts uploading report.pdf to your store
+- Enters a waiting loop (keeps checking if upload finished)
+- Every 2 seconds, asks "Are you done yet?" by checking operation.done
+- When operation.done becomes True, exits the loop
+- Result: Your code waits until the document is fully processed and searchable
+
 ### The Wrong Way - Don't Do This
 
 ```python
@@ -137,6 +157,12 @@ operation = client.file_search_stores.upload_to_file_search_store(
 # This will fail or return empty results!
 response = client.models.generate_content(...)  # ❌ Too soon!
 ```
+
+**What this code does (and why it's wrong):**
+- Uploads file and immediately tries to search it
+- Problem: File is still processing (not indexed yet)
+- Like trying to check out a library book while librarian is still cataloging it
+- Result: Empty search results or "document not found" errors
 
 ### Check Document State
 
@@ -156,6 +182,13 @@ elif doc.state == 'STATE_PENDING':
 elif doc.state == 'STATE_FAILED':
     print('✗ Processing failed, check document')
 ```
+
+**What this code does:**
+- Gets the document name from completed upload operation
+- Fetches current document status from the API
+- Checks state: ACTIVE (ready), PENDING (still processing), or FAILED (error)
+- Prints user-friendly message based on state
+- Think of it as checking if library finished cataloging your book
 
 ## Uploading Multiple Files
 
@@ -178,6 +211,13 @@ for file in files:
 
     print(f'✓ {file} uploaded')
 ```
+
+**What this code does:**
+- Loops through 3 PDF files one at a time
+- For each file: upload → wait for processing → move to next
+- Creates clean display names by removing .pdf extension
+- Sequential processing: report1 finishes before report2 starts
+- Total time: sum of all individual upload times (slower but simpler)
 
 ### Parallel Upload (Faster)
 
@@ -207,6 +247,14 @@ with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
         print(f'✓ {future.result()} uploaded')
 ```
 
+**What this code does:**
+- Creates worker threads (max 3 simultaneous uploads)
+- Submits all 3 files to upload simultaneously (not one-at-a-time)
+- Each file uploads and processes in parallel
+- Prints confirmation as each file completes (whichever finishes first)
+- Total time: roughly the time of the slowest single upload (much faster)
+- Think: 3 librarians cataloging 3 books at once vs 1 librarian doing all 3
+
 ## Adding Metadata
 
 Metadata makes documents searchable by category, date, author, etc.
@@ -228,6 +276,13 @@ operation = client.file_search_stores.upload_to_file_search_store(
     }
 )
 ```
+
+**What this code does:**
+- Uploads report.pdf with attached labels (metadata)
+- Adds 4 labels: department, year, quarter, confidential
+- Think of metadata like sticky notes on a file folder
+- Later you can search "only Finance docs from Q2 2024"
+- Makes finding specific documents much faster and more accurate
 
 ### Why Metadata Matters
 
@@ -253,6 +308,13 @@ response = client.models.generate_content(
     )
 )
 ```
+
+**What this code does:**
+- Asks "What was total revenue?" but ONLY searches Q2 Finance documents
+- metadata_filter acts like a pre-filter before search
+- Skips all non-Finance, non-Q2 documents entirely
+- Result: Faster search, more accurate answer (correct quarter/department)
+- Without filter: might get revenue from wrong quarter or department
 
 Searches only relevant documents - faster and more accurate.
 
@@ -281,6 +343,12 @@ operation = client.file_search_stores.upload_to_file_search_store(
 )
 ```
 
+**What this code does:**
+- Uploads a PDF file to your store
+- PDF text automatically extracted and indexed
+- Works best with text-based PDFs (not scanned images)
+- After processing, you can search the contents
+
 Works with:
 - Text-based PDFs ✓
 - Scanned PDFs with embedded text ✓
@@ -295,6 +363,12 @@ operation = client.file_search_stores.upload_to_file_search_store(
 )
 ```
 
+**What this code does:**
+- Uploads Word document (.docx or .doc)
+- Text automatically extracted from Word formatting
+- Headers, paragraphs, tables all indexed
+- Works same as PDF - upload and search
+
 Supports: .docx, .doc
 
 ### Excel Spreadsheets
@@ -305,6 +379,12 @@ operation = client.file_search_stores.upload_to_file_search_store(
     file_search_store_name=store.name
 )
 ```
+
+**What this code does:**
+- Uploads Excel spreadsheet
+- Extracts text from all sheets (sheet names, headers, cell values)
+- Best for spreadsheets with descriptions/text, not just numbers
+- After indexing, you can search cell contents
 
 Extracts:
 - Sheet names
@@ -325,6 +405,12 @@ for file in files:
     )
 ```
 
+**What this code does:**
+- Uploads code files (Python, JavaScript, Markdown)
+- Code indexed as plain text - searchable line by line
+- Can later ask "Where is the login function?" or "How does authentication work?"
+- Good for creating searchable code documentation
+
 Great for:
 - Code documentation
 - Finding specific functions
@@ -339,6 +425,12 @@ operation = client.file_search_stores.upload_to_file_search_store(
 )
 ```
 
+**What this code does:**
+- Uploads plain text file
+- Simplest format - entire content indexed as-is
+- Works with any text-based file format
+- After processing, full text searchable
+
 Supports: .txt, .md, .rtf
 
 ### ZIP Archives (Auto-Extracted)
@@ -349,6 +441,13 @@ operation = client.file_search_stores.upload_to_file_search_store(
     file_search_store_name=store.name
 )
 ```
+
+**What this code does:**
+- Uploads ZIP archive (compressed folder)
+- Automatically unzips and uploads each file inside separately
+- Folder structure preserved in document names
+- One upload = many documents indexed
+- Perfect for bulk uploading entire document collections
 
 Automatically:
 - Extracts all files
@@ -410,6 +509,14 @@ operation = client.file_search_stores.upload_to_file_search_store(
 )
 ```
 
+**What this code does:**
+- Opens large PDF that's too big to upload
+- Extracts all text from every page
+- Saves text to .txt file (much smaller than PDF)
+- Uploads the text file instead of original PDF
+- Result: Searchable content without huge file size
+- Trade-off: Loses images, formatting, but keeps all text
+
 ## Troubleshooting Uploads
 
 ### Upload Hangs
@@ -435,6 +542,12 @@ doc = client.file_search_stores.documents.get(name=doc_name)
 if doc.state == 'STATE_FAILED':
     print(f'Failed: {doc}')  # Check for error details
 ```
+
+**What this code does:**
+- Fetches document details after upload fails
+- Checks if state is FAILED
+- Prints full document object with error details
+- Helps diagnose why processing failed (corrupt file, unsupported format, etc.)
 
 ### Document Not Found After Upload
 

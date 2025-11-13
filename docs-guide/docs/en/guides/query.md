@@ -39,6 +39,14 @@ response = client.models.generate_content(
 print(response.text)
 ```
 
+**What this code does:**
+- Sets up connection to Gemini API
+- Asks natural language question: "What was Q2 revenue?"
+- Tells Gemini to search your specific store for the answer
+- File search finds relevant document sections automatically
+- AI reads those sections and generates answer
+- Prints the answer (like "$50 million" with context)
+
 That's it! You get an answer based on your documents.
 
 ## Understanding the Query Flow
@@ -227,6 +235,13 @@ response = client.models.generate_content(
 )
 ```
 
+**What this code does:**
+- Adds metadata_filter to narrow search scope
+- Only searches Finance department docs from 2024
+- Ignores all other departments and years
+- Faster query (fewer docs to search)
+- More accurate answer (correct department + year guaranteed)
+
 ### Query Multiple Stores
 
 ```python
@@ -247,6 +262,13 @@ response = client.models.generate_content(
     )
 )
 ```
+
+**What this code does:**
+- Searches 3 different stores at once
+- Finds security requirements across security, compliance, AND engineering docs
+- AI combines information from all 3 sources
+- Good for: Questions spanning multiple document collections
+- Result: Comprehensive answer pulling from all relevant stores
 
 Searches all three stores simultaneously.
 
@@ -271,6 +293,13 @@ response = client.models.generate_content(
 answer = response.text
 print(f'Answer: {answer}')
 ```
+
+**What this code does:**
+- Performs query and gets response object
+- Extracts just the text answer from response
+- response.text gives you the plain English answer
+- Prints formatted answer
+- Simple way to get answer without citations
 
 ### Extracting Citations
 
@@ -300,6 +329,15 @@ for candidate in response.candidates:
             relevance = getattr(chunk, 'relevance_score', 0)
             print(f'- {doc_name} (relevance: {relevance:.2f})')
 ```
+
+**What this code does:**
+- Gets answer from query
+- Prints the answer text first
+- Then extracts and prints source citations
+- For each citation: gets document name and relevance score
+- Shows which documents were used to generate the answer
+- Relevance score shows how important each source was (0.0-1.0)
+- Lets you verify answer accuracy by checking sources
 
 ### Complete Response Object
 
@@ -382,6 +420,13 @@ except Exception as e:
     print(f'Query failed: {e}')
 ```
 
+**What this code does:**
+- Wraps query in try/except for error handling
+- If query succeeds: prints answer normally
+- If query fails: catches error and prints friendly message
+- Prevents crashes from network issues, invalid stores, etc.
+- Good practice for production code
+
 ## Multi-Turn Conversations
 
 You can have follow-up conversations:
@@ -419,6 +464,15 @@ response2 = client.models.generate_content(
 )
 print(response2.text)  # "Q2 revenue of $50M represents 25% growth from Q1's $40M"
 ```
+
+**What this code does:**
+- First query: Asks Q2 revenue, gets answer
+- Second query: Builds conversation history (user→model→user)
+- Includes previous question + answer in contents list
+- Asks follow-up "How does that compare to Q1?"
+- AI remembers "$50M" from first answer, compares to Q1
+- Result: Contextual answer referencing previous conversation
+- Like chatting with someone who remembers what you just discussed
 
 The model remembers context and can answer follow-ups.
 
@@ -482,6 +536,16 @@ answer = query_documents(
     year='2024'
 )
 ```
+
+**What this code does:**
+- Flexible query function with optional filters
+- Builds filter string dynamically based on what's provided
+- If department given: adds department filter
+- If year given: adds year filter
+- Joins all filters with AND
+- If no filters: searches everything
+- Example: Queries Finance 2024 docs for revenue
+- Reusable for any question + filter combination
 
 ## Performance Optimization
 

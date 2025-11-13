@@ -40,6 +40,14 @@ if not os.getenv('GEMINI_API_KEY'):
     raise ValueError('GEMINI_API_KEY not set')
 ```
 
+**What this code does:**
+- Loads API key from .env file (not hardcoded in code)
+- Creates Gemini client with environment variable
+- Validates key exists before starting
+- Raises error if key missing (fail fast)
+- Secure: API key never appears in source code or git
+- Good practice: Easy to change keys without editing code
+
 ### 2. Validate File Uploads
 
 ```python
@@ -68,6 +76,15 @@ async def upload(file: UploadFile):
     # Process upload...
 ```
 
+**What this code does:**
+- Security: Validates all uploaded files before processing
+- Checks file extension (only allows safe types)
+- Checks file size (rejects files >100MB)
+- Prevents: Uploading malicious files, huge files that crash server
+- Returns 400 error if validation fails
+- Resets file pointer after reading (so can be read again)
+- Critical for production: Never trust user uploads
+
 ### 3. Rate Limiting
 
 ```python
@@ -85,6 +102,14 @@ async def query(request: Request, query: QueryRequest):
     # Handle query...
     pass
 ```
+
+**What this code does:**
+- Protects against abuse: Limits requests per user/IP
+- Sets up rate limiter tracking by IP address
+- Decorator limits endpoint to 10 requests per minute per IP
+- Exceeding limit: Returns 429 error (too many requests)
+- Prevents: DOS attacks, API abuse, cost overruns
+- Production essential: Protects your Gemini API quota and costs
 
 ### 4. Input Sanitization
 
@@ -106,6 +131,14 @@ class QueryRequest(BaseModel):
 
         return clean.strip()
 ```
+
+**What this code does:**
+- Sanitizes user input before processing
+- Removes any HTML/script tags (prevents XSS attacks)
+- Limits question length to 500 chars (prevents abuse)
+- Validator runs automatically when request received
+- Returns cleaned text or raises validation error
+- Security: Never trust user input, always sanitize
 
 ## Deployment Options
 
@@ -422,6 +455,15 @@ def query(request: QueryRequest):
         raise
 ```
 
+**What this code does:**
+- Structured logging in JSON format (machine-readable)
+- Each log entry: timestamp, level, message, module, function
+- Logs query received with metadata (store_id, question length)
+- Logs success or failure with details
+- JSON format: Easy to parse by log aggregation tools
+- Production: Essential for debugging issues in live system
+- Can search/analyze logs programmatically
+
 ### Health Check Endpoint
 
 ```python
@@ -442,6 +484,15 @@ def health_check():
             'error': str(e)
         }, 503
 ```
+
+**What this code does:**
+- Health check endpoint for monitoring systems
+- Tests Gemini API connection (list stores)
+- Returns 200 + healthy if working
+- Returns 503 + unhealthy if Gemini API down
+- Load balancers use this to route traffic only to healthy servers
+- Monitoring tools can alert if health check fails
+- Critical for: Production deployments, auto-scaling, alerting
 
 ### Metrics Tracking
 
@@ -586,6 +637,15 @@ async def schedule_backups():
 
     schedule.every().day.at('02:00').do(backup_all_stores)
 ```
+
+**What this code does:**
+- Backs up store and document metadata to JSON file
+- Saves: store info, document list with names/states/metadata
+- Creates timestamped backup file (backup_STOREID_20250113_020000.json)
+- Scheduler: Runs automatic backups daily at 2am
+- Doesn't backup file contents (only metadata)
+- Critical for: Disaster recovery, tracking what docs you had
+- If store deleted accidentally: Can see what was in it
 
 ## Troubleshooting Production Issues
 
