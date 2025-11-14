@@ -63,24 +63,36 @@ async def list_documents(store_id: str, page_size: int = 10):
             store_name=f'fileSearchStores/{store_id}',
             page_size=page_size
         )
-        return {
-            'documents': [
-                {
-                    'name': d.name,
-                    'display_name': d.display_name,
-                    'create_time': d.create_time,
-                    'update_time': d.update_time,
-                    'state': d.state,
-                    'size_bytes': d.size_bytes,
-                    'mime_type': d.mime_type,
-                    'custom_metadata': [
+
+        # Convert Pager to list
+        doc_list = list(documents) if documents else []
+
+        # Build response
+        result = []
+        for d in doc_list:
+            # Handle custom_metadata separately
+            custom_meta = []
+            if hasattr(d, 'custom_metadata') and d.custom_metadata:
+                try:
+                    custom_meta = [
                         {'key': m.key, 'value': m.string_value}
-                        for m in getattr(d, 'custom_metadata', [])
+                        for m in d.custom_metadata
                     ]
-                }
-                for d in documents
-            ]
-        }
+                except (AttributeError, TypeError):
+                    custom_meta = []
+
+            result.append({
+                'name': d.name,
+                'display_name': d.display_name,
+                'create_time': d.create_time,
+                'update_time': d.update_time,
+                'state': d.state,
+                'size_bytes': d.size_bytes,
+                'mime_type': d.mime_type,
+                'custom_metadata': custom_meta
+            })
+
+        return {'documents': result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

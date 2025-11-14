@@ -34,9 +34,17 @@ async def search(request: QueryRequest):
             model=request.model
         )
 
-        # Extract text and grounding metadata
+        # Extract text - strip markdown formatting
+        text = response.text if hasattr(response, 'text') else ''
+        # Remove markdown: **bold**, *italic*, __bold__, _italic_
+        import re
+        text = re.sub(r'\*\*([^*]+)\*\*', r'\1', text)  # **text**
+        text = re.sub(r'__([^_]+)__', r'\1', text)      # __text__
+        text = re.sub(r'\*([^*]+)\*', r'\1', text)      # *text*
+        text = re.sub(r'_([^_]+)_', r'\1', text)        # _text_
+
         result = {
-            'text': response.text if hasattr(response, 'text') else '',
+            'text': text,
             'citations': []
         }
 

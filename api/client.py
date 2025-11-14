@@ -129,11 +129,20 @@ class GeminiClient:
         if metadata_filter:
             tool_config.metadata_filter = metadata_filter
 
+        # Add system instruction to prioritize documents
+        system_instruction = (
+            "You are a helpful assistant that answers questions based on uploaded documents. "
+            "ALWAYS search and use information from the available documents to answer questions. "
+            "If the answer is in the documents, provide it. "
+            "If not found in documents, clearly state that."
+        )
+
         response = self._client.models.generate_content(
             model=model,
             contents=query,
             config=types.GenerateContentConfig(
-                tools=[types.Tool(file_search=tool_config)]
+                tools=[types.Tool(file_search=tool_config)],
+                system_instruction=system_instruction
             )
         )
         return response

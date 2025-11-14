@@ -42,7 +42,7 @@
 
 <div class="card">
     <h2>Documents</h2>
-    <div id="documents-list" hx-get="/api/stores/{{ store_id }}/documents" hx-trigger="load, documentUploaded from:body" hx-swap="innerHTML">
+    <div id="documents-list">
         <div class="loading">Loading documents...</div>
     </div>
 </div>
@@ -321,15 +321,22 @@ async function deleteDocument(docName) {
     }
 }
 
-// HTMX after-swap
-document.addEventListener('htmx:afterSwap', function(event) {
-    if (event.detail.target.id === 'documents-list') {
-        renderDocuments(event.detail.xhr.response);
+// Load documents
+async function loadDocuments() {
+    try {
+        const response = await fetch(`/api/stores/${storeId}/documents`);
+        const data = await response.json();
+        renderDocuments(data);
+    } catch (error) {
+        document.getElementById('documents-list').innerHTML =
+            `<p style="color: #ea4335;">Error loading documents: ${error.message}</p>`;
     }
-});
+}
 
-function renderDocuments(responseText) {
-    const data = JSON.parse(responseText);
+// Listen for document upload events
+document.body.addEventListener('documentUploaded', loadDocuments);
+
+function renderDocuments(data) {
     const container = document.getElementById('documents-list');
 
     if (!data.documents || data.documents.length === 0) {
@@ -383,7 +390,8 @@ function formatBytes(bytes) {
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
 }
 
-// Load store info on page load
+// Load store info and documents on page load
 loadStoreInfo();
+loadDocuments();
 </script>
 {% endblock %}
